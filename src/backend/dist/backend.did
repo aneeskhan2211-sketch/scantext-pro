@@ -1,0 +1,173 @@
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type UserView = 
+ record {
+   createdAt: Timestamp;
+   id: UserId;
+   language: text;
+   plan: UserPlan;
+   scansToday: int;
+   totalScans: int;
+   updatedAt: Timestamp;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserPlan = 
+ variant {
+   free;
+   premium;
+ };
+type UserId = principal;
+type UsageLimitsView = 
+ record {
+   canScan: bool;
+   dailyLimit: int;
+   lastResetDate: Timestamp;
+   scansToday: int;
+   userId: UserId;
+ };
+type UpsertSubscriptionArgs = 
+ record {
+   currentPeriodEnd: opt Timestamp;
+   plan: text;
+   stripeSubscriptionId: opt text;
+ };
+type UpdateUserArgs = 
+ record {
+   language: opt text;
+   plan: opt UserPlan;
+ };
+type UpdateScanArgs = 
+ record {
+   confidenceScore: opt float64;
+   exportCount: opt int;
+   extractedText: opt text;
+   folderId: opt FolderId;
+   id: ScanId;
+   isFavorite: opt bool;
+   isPinned: opt bool;
+   language: opt text;
+   tags: opt vec text;
+ };
+type Timestamp = int;
+type SubscriptionView = 
+ record {
+   currentPeriodEnd: opt Timestamp;
+   id: SubscriptionId;
+   plan: text;
+   stripeSubscriptionId: opt text;
+   userId: UserId;
+ };
+type SubscriptionId = text;
+type ScanView = 
+ record {
+   confidenceScore: float64;
+   createdAt: Timestamp;
+   exportCount: int;
+   extractedText: text;
+   folderId: opt FolderId;
+   id: ScanId;
+   image: ExternalBlob;
+   isDeleted: bool;
+   isFavorite: bool;
+   isPinned: bool;
+   language: text;
+   scanType: ScanType;
+   tags: vec text;
+   updatedAt: Timestamp;
+   userId: UserId;
+ };
+type ScanType = 
+ variant {
+   card;
+   document;
+   other;
+   receipt;
+ };
+type ScanId = text;
+type ListScansResult = 
+ record {
+   scans: vec ScanView;
+   total: nat;
+ };
+type ListScansArgs = 
+ record {
+   folderId: opt FolderId;
+   includeDeleted: bool;
+   limit: nat;
+   offset: nat;
+ };
+type FolderView = 
+ record {
+   createdAt: Timestamp;
+   icon: text;
+   id: FolderId;
+   name: text;
+   userId: UserId;
+ };
+type FolderId = text;
+type ExternalBlob = blob;
+type CreateScanArgs = 
+ record {
+   confidenceScore: float64;
+   extractedText: text;
+   folderId: opt FolderId;
+   image: ExternalBlob;
+   language: text;
+   scanType: ScanType;
+   tags: vec text;
+ };
+type CreateFolderArgs = 
+ record {
+   icon: text;
+   name: text;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  checkUsageLimit: () -> (UsageLimitsView);
+  createFolder: (args: CreateFolderArgs) -> (FolderView);
+  createOrUpdateSubscription: (args: UpsertSubscriptionArgs) ->
+   (SubscriptionView);
+  createScan: (args: CreateScanArgs) -> (ScanView);
+  deleteAccount: () -> ();
+  deleteFolder: (folderId: FolderId) -> ();
+  deleteScan: (scanId: ScanId) -> ();
+  getCallerUserRole: () -> (UserRole) query;
+  getOrCreateUser: () -> (UserView);
+  getScan: (scanId: ScanId) -> (opt ScanView) query;
+  getSubscription: () -> (opt SubscriptionView) query;
+  incrementScanCount: () -> ();
+  isCallerAdmin: () -> (bool) query;
+  listFolders: () -> (vec FolderView) query;
+  listScans: (args: ListScansArgs) -> (ListScansResult) query;
+  resetDailyLimits: () -> ();
+  restoreScan: (scanId: ScanId) -> ();
+  searchScans: (searchQuery: text) -> (vec ScanView) query;
+  updateScan: (args: UpdateScanArgs) -> (ScanView);
+  updateUser: (args: UpdateUserArgs) -> (UserView);
+}

@@ -1,0 +1,30 @@
+{
+  "overview": "ScanText Pro is a premium mobile-first OCR web app that lets you capture, extract, and organize text from any document, receipt, business card, or handwritten note. Powered by Google Cloud Vision AI with a polished, production-quality interface.",
+  "features": [
+    "Camera capture and gallery image upload for scanning",
+    "AI-powered OCR text extraction in 7 languages (English, Hindi, Arabic, Urdu, Marathi, Tamil, Malayalam)",
+    "Image enhancement with brightness, contrast, and filter controls",
+    "Editable OCR results with one-tap copy to clipboard",
+    "Scan history with full-text search across all documents",
+    "Export to TXT, PDF, DOCX, and CSV formats",
+    "Text-to-speech: listen to extracted text aloud",
+    "Smart post-OCR suggestions: Translate, Summarize, Export PDF, Save Contact, Share",
+    "QR and barcode scanner",
+    "Free tier (10 scans/day) and Premium subscription via Stripe",
+    "Dark mode and light mode",
+    "Mobile-first responsive design with bottom navigation"
+  ],
+  "category": "productivity",
+  "tags": [
+    "ocr",
+    "scanner",
+    "text-extraction",
+    "productivity",
+    "documents",
+    "mobile",
+    "ai",
+    "multilingual",
+    "pwa"
+  ],
+  "last_updated": "2026-05-07T20:12:57.801Z"
+}

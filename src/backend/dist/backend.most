@@ -1,0 +1,129 @@
+// Version: 1.0.0
+type ActivityId__326478791 = Text;
+type Activity__1027287507 =
+  {
+    action : Text;
+    id : ActivityId__326478791;
+    timestamp : Timestamp__301639476;
+    userId : UserId__158757552
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type ExternalBlob__671167343 = Blob;
+type FolderId__432322121 = Text;
+type Folder__174424243 =
+  {
+    createdAt : Timestamp__301639476;
+    var icon : Text;
+    id : FolderId__432322121;
+    var name : Text;
+    userId : UserId__158757552
+  };
+type Int__270357528 = Int__616954475;
+type Int__616954475 = Int;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type ScanId__198292568 = Text;
+type ScanType__633773918 = {#card; #document; #other; #receipt};
+type Scan__7577365 =
+  {
+    var confidenceScore : Float;
+    createdAt : Timestamp__301639476;
+    var exportCount : Int;
+    var extractedText : Text;
+    var folderId : ?FolderId__432322121;
+    id : ScanId__198292568;
+    image : ExternalBlob__671167343;
+    var isDeleted : Bool;
+    var isFavorite : Bool;
+    var isPinned : Bool;
+    var language : Text;
+    scanType : ScanType__633773918;
+    var tags : [Text];
+    var updatedAt : Timestamp__301639476;
+    userId : UserId__158757552
+  };
+type SubscriptionId__300481435 = Text;
+type Subscription__929711557 =
+  {
+    var currentPeriodEnd : ?Timestamp__301639476;
+    id : SubscriptionId__300481435;
+    var plan : Text;
+    var stripeSubscriptionId : ?Text;
+    userId : UserId__158757552
+  };
+type Time__796480547 = Int__270357528;
+type Time__900049286 = Time__796480547;
+type Timestamp__301639476 = Time__900049286;
+type UsageLimits__496039932 =
+  {
+    var lastResetDate : Timestamp__301639476;
+    var scansToday : Int;
+    userId : UserId__158757552
+  };
+type UserId__158757552 = Principal;
+type UserPlan__604266183 = {#free; #premium};
+type UserRole__1073662873 = {#admin; #guest; #user};
+type User__933515552 =
+  {
+    createdAt : Timestamp__301639476;
+    id : UserId__158757552;
+    var language : Text;
+    var plan : UserPlan__604266183;
+    var scansToday : Int;
+    var totalScans : Int;
+    var updatedAt : Timestamp__301639476
+  };
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1073662873>
+    };
+  stable activities :
+    {
+      var root : Node__46230540<ActivityId__326478791, Activity__1027287507>;
+      var size : Nat__490723111
+    };
+  stable folders :
+    {
+      var root : Node__46230540<FolderId__432322121, Folder__174424243>;
+      var size : Nat__490723111
+    };
+  stable scans :
+    {
+      var root : Node__46230540<ScanId__198292568, Scan__7577365>;
+      var size : Nat__490723111
+    };
+  stable seqState :
+    {
+      var nextActivityId : Nat;
+      var nextFolderSeq : Nat;
+      var nextScanSeq : Nat;
+      var nextSubSeq : Nat
+    };
+  stable subscriptions :
+    {
+      var root : Node__46230540<UserId__158757552, Subscription__929711557>;
+      var size : Nat__490723111
+    };
+  stable usageLimits :
+    {
+      var root : Node__46230540<UserId__158757552, UsageLimits__496039932>;
+      var size : Nat__490723111
+    };
+  stable users :
+    {
+      var root : Node__46230540<UserId__158757552, User__933515552>;
+      var size : Nat__490723111
+    }
+};
