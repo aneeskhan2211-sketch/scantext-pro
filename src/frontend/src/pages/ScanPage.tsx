@@ -5,6 +5,7 @@ import { SUPPORTED_LANGUAGES } from "@/services/ocr.service";
 import { useScanStore } from "@/stores/scanStore";
 import { ScanType } from "@/types";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import jsQR from "jsqr";
 import {
   AlertTriangle,
   CameraOff,
@@ -224,17 +225,29 @@ export default function ScanPage() {
         }
       }
       setIsScanning(true);
-      // Real QR decoding would use jsQR here; polling canvas is set up
       qrIntervalRef.current = setInterval(() => {
         if (!qrVideoRef.current || !qrCanvasRef.current) return;
         const v = qrVideoRef.current;
         const cv = qrCanvasRef.current;
-        if (!v.videoWidth) return;
+        if (!v.videoWidth || !v.videoHeight) return;
         cv.width = v.videoWidth;
         cv.height = v.videoHeight;
         const ctx = cv.getContext("2d");
-        ctx?.drawImage(v, 0, 0);
-        // jsQR(ctx.getImageData(...)) would go here in production
+        if (!ctx) return;
+        ctx.drawImage(v, 0, 0);
+        const imageData = ctx.getImageData(0, 0, cv.width, cv.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (code?.data) {
+          setQrResults((prev) => {
+            if (prev.length > 0 && prev[0].data === code.data) return prev;
+            return [{ data: code.data, timestamp: Date.now() }, ...prev].slice(
+              0,
+              10,
+            );
+          });
+        }
       }, 150);
     } catch (e) {
       setQrError(e instanceof Error ? e.message : "Camera access denied");

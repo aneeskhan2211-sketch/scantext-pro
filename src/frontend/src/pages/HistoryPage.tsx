@@ -1,5 +1,16 @@
 import { EmptyState } from "@/components/EmptyState";
 import { SkeletonList } from "@/components/SkeletonCard";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -322,14 +333,60 @@ export default function HistoryPage() {
               {sortOrder === "newest" ? "Newest" : "Oldest"}
             </button>
             {activeFilter === "trash" && scans.length > 0 && (
-              <button
-                type="button"
-                data-ocid="history.empty_trash_button"
-                className="text-xs font-body text-destructive bg-destructive/10 px-2.5 py-1.5 rounded-lg hover:bg-destructive/20 transition-colors"
-                onClick={() => toast.info("Empty Trash coming soon")}
-              >
-                Empty
-              </button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    type="button"
+                    data-ocid="history.empty_trash_button"
+                    className="text-xs font-body text-destructive bg-destructive/10 px-2.5 py-1.5 rounded-lg hover:bg-destructive/20 transition-colors"
+                  >
+                    Empty
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-card border-border">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="font-display text-foreground">
+                      Empty Trash?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-muted-foreground font-body">
+                      This will permanently delete all {scans.length} item
+                      {scans.length !== 1 ? "s" : ""} in the trash. This action
+                      cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      className="font-body"
+                      data-ocid="history.empty_trash_cancel_button"
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-body"
+                      data-ocid="history.empty_trash_confirm_button"
+                      onClick={async () => {
+                        const ids = scans.map((s) => s.id);
+                        await Promise.all(
+                          ids.map(
+                            (id) =>
+                              new Promise<void>((resolve) =>
+                                deleteScan.mutate(id, {
+                                  onSuccess: () => resolve(),
+                                  onError: () => resolve(),
+                                }),
+                              ),
+                          ),
+                        );
+                        toast.success(
+                          `Permanently deleted ${ids.length} item${ids.length !== 1 ? "s" : ""}`,
+                        );
+                      }}
+                    >
+                      Delete All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </div>

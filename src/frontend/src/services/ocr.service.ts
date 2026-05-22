@@ -57,24 +57,17 @@ export async function performOCR(
  * Local OCR — uses browser canvas for basic text extraction placeholder.
  * In a real implementation this would integrate with Tesseract.js or ML Kit.
  */
+/**
+ * Local OCR — routes through cloud OCR for all users.
+ * Quota enforcement (10/day free, unlimited premium) is handled by the backend.
+ */
 async function performLocalOCR(
-  _imageDataUrl: string,
+  imageDataUrl: string,
   language: SupportedLanguage,
   onProgress?: (pct: number) => void,
 ): Promise<OCRResult> {
-  onProgress?.(30);
-  await delay(400);
-  onProgress?.(70);
-  await delay(400);
-  onProgress?.(100);
-
-  // Placeholder result — real implementation integrates Tesseract.js
-  return {
-    text: "",
-    confidence: 0,
-    language,
-    blocks: [],
-  };
+  // Route all users through cloud OCR (quota enforced by backend)
+  return performCloudOCR(imageDataUrl, language, onProgress);
 }
 
 /**
@@ -143,8 +136,4 @@ export function extractEntities(text: string) {
     urls: text.match(urlRegex) ?? [],
     addresses: text.match(addressRegex) ?? [],
   };
-}
-
-function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
 }

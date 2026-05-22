@@ -6,11 +6,13 @@ import type { ScanView } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import {
+  AlertCircle,
   ArrowLeft,
   Clock,
   CreditCard,
   FileText,
   Receipt,
+  RefreshCw,
   Search,
   X,
 } from "lucide-react";
@@ -147,7 +149,7 @@ export default function SearchPage() {
     return () => clearTimeout(t);
   }, []);
 
-  const { data: results, isLoading } = useSearchScans(query);
+  const { data: results, isLoading, isError, refetch } = useSearchScans(query);
 
   const handleSelect = useCallback((q: string) => {
     setInputValue(q);
@@ -170,9 +172,11 @@ export default function SearchPage() {
 
   const showRecents = !query && recents.length > 0;
   const showEmpty = !query;
+  const showError = !!query && !isLoading && isError;
   const showNoResults =
-    !!query && !isLoading && (!results || results.length === 0);
-  const showResults = !!query && !isLoading && results && results.length > 0;
+    !!query && !isLoading && !isError && (!results || results.length === 0);
+  const showResults =
+    !!query && !isLoading && !isError && results && results.length > 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-24">
@@ -267,6 +271,38 @@ export default function SearchPage() {
                 Find by title or extracted text
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {showError && (
+          <div
+            data-ocid="search.error_state"
+            className="flex flex-col items-center justify-center py-20 gap-4"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center">
+              <AlertCircle
+                className="w-8 h-8 text-destructive"
+                strokeWidth={1.5}
+              />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-base font-display font-semibold text-foreground">
+                Search failed
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Something went wrong while searching. Please try again.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-ocid="search.retry_button"
+              onClick={() => refetch()}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-body font-medium hover:bg-primary/90 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retry
+            </button>
           </div>
         )}
 
